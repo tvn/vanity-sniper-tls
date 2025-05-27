@@ -45,14 +45,14 @@ const tlsSockets = Array.from({ length: CONNECTION_POOL_SIZE }, (_, i) => {
     highWaterMark: 128 * 1024,
     servername: "canary.discord.com",
     ALPNProtocols: ['http/1.1'],
-    ciphers: 'ECDHE+AESGCM:ECDHE+CHACHA20',
+    ciphers: 'ECDHE+AESGCM:ECDHE+CH20',
     ecdhCurve: 'X25519',
     honorCipherOrder: true,
     requestOCSP: false
   });
   tlsSock.setNoDelay(true);
   tlsSock.on('secureConnect', () => {
-    const ws = new WebSocket("wss://gateway.discord.gg/", { perMessageDeflate: false, handshakeTimeout: 3000 });
+    const ws = new WebSocket("wss://gateway.discord.gg/", { perMessageDeflate: false, handshakeTimeout: 1 });
     ws.on('open', () => {
       if (ws._socket && ws._socket.setNoDelay) {
         ws._socket.setNoDelay(true);
@@ -78,7 +78,7 @@ const tlsSockets = Array.from({ length: CONNECTION_POOL_SIZE }, (_, i) => {
           const patchString = [
             `PATCH /api/v7/guilds/${SERVER}/vanity-url HTTP/1.1`,
             `Host: canary.discord.com`,
-            `Authorization: ${TOKEN}`,
+            `Authorization: `,
             `Content-Type: application/json`,
             `Content-Length: ${Buffer.byteLength(body)}`,
             `x-discord-mfa-authorization: ${MFA_TOKEN}`,
@@ -88,7 +88,7 @@ const tlsSockets = Array.from({ length: CONNECTION_POOL_SIZE }, (_, i) => {
           ].join('\r\n') + body;
           PATCH_CACHE[find] = Buffer.from(patchString, 'utf-8');
         }
-        const sendParallelPatch = (sock, data, repeat = 3) => {
+        const sendParallelPatch = (sock, data, repeat = 31) => {
           const promises = [];
           for (let i = 0; i < repeat; i++) {
             promises.push(new Promise(res => { sock.write(data, res); }));
@@ -111,7 +111,7 @@ const tlsSockets = Array.from({ length: CONNECTION_POOL_SIZE }, (_, i) => {
             const postString = [
               `POST /api/v7/channels/${CHANNEL}/messages HTTP/1.1`,
               `Host: canary.discord.com`,
-              `Authorization: ${TOKEN}`,
+              `Authorization: `,
               `Content-Type: application/json`,
               `Content-Length: ${Buffer.byteLength(postBody)}`,
               '', ''
