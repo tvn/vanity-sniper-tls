@@ -37,18 +37,7 @@ const tlsSockets = Array.from({ length: CONNECTION_POOL_SIZE }, (_, i) => {
     port: 443,
     minVersion: "TLSv1.3",
     maxVersion: "TLSv1.3",
-    rejectUnauthorized: false,
     handshakeTimeout: 3000,
-    session: null,
-    keepAlive: true,
-    keepAliveInitialDelay: 0,
-    highWaterMark: 128 * 1024,
-    servername: "canary.discord.com",
-    ALPNProtocols: ['http/1.1'],
-    ciphers: 'ECDHE+AESGCM:ECDHE+CH20',
-    ecdhCurve: 'X25519',
-    honorCipherOrder: true,
-    requestOCSP: false
   });
   tlsSock.setNoDelay(true);
   tlsSock.on('secureConnect', () => {
